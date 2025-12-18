@@ -18,5 +18,8 @@ document.querySelector('#btn-register').addEventListener('click', async e =>{
     console.log(res);
     
     showToast(res.data.message)
-    location.href = './login.html'
+    setTimeout (() =>{
+        location.href = './login.html'
+    },2000)
+    
 })

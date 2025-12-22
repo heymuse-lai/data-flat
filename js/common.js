@@ -3,7 +3,7 @@
 axios.defaults.baseURL = 'https://hmajax.itheima.net'
 
 // 公共的提示框
-const showToast = (msg) =>{
+const showToast = (msg) => {
     // 透過 JavaScript 初始化 toast 提示框
     // const toastElList = document.querySelectorAll('.toast')
     // const toastList = [...toastElList].map(toastEl => new bootstrap.Toast(toastEl, option))
@@ -11,6 +11,18 @@ const showToast = (msg) =>{
     const myToast = document.querySelector('.my-toast')
     const toastObj = new bootstrap.Toast(myToast)
     toastObj.show()
-    document.querySelector('.toast-body').innerHTML=msg
-    
+    document.querySelector('.toast-body').innerHTML = msg
+
+}
+// 判斷是否有token
+const checkToken = () => {
+    const { token } = JSON.parse(localStorage.getItem('userMsg'))
+    console.log(token)
+    if (!token) {
+        showToast('請先登錄')
+        setTimeout(() => {
+            location.href = './login.html'
+        }, 1500)
+    }
+
 }

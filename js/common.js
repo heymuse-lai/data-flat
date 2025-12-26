@@ -1,8 +1,8 @@
-// 配置axios基地址
+// 1.配置axios基地址
 // axios.defaults.baseURL:'https://hmajax.itheima.net'
 axios.defaults.baseURL = 'https://hmajax.itheima.net'
 
-// 公共的提示框
+// 2.公共的提示框
 const showToast = (msg) => {
     // 透過 JavaScript 初始化 toast 提示框
     // const toastElList = document.querySelectorAll('.toast')
@@ -14,10 +14,12 @@ const showToast = (msg) => {
     document.querySelector('.toast-body').innerHTML = msg
 
 }
-// 判斷是否有token
+const data = localStorage.getItem('userMsg') ? JSON.parse(localStorage.getItem('userMsg')) : {}
+
+// 3.判斷是否有token
 const checkToken = () => {
-    const { token } = JSON.parse(localStorage.getItem('userMsg'))
-    // console.log(token)
+    const { token } = data
+    console.log(token)
     if (!token) {
         showToast('請先登錄')
         setTimeout(() => {
@@ -28,19 +30,19 @@ const checkToken = () => {
 }
 
 
-// 用戶名回顯及退出功能
+// 4.用戶名回顯及退出功能
 const renderUname = () => {
     // document.querySelector('.username').innerHTML = localStorage.getItem()
-    const { username } = JSON.parse(localStorage.getItem('userMsg'))
+    const { username } = data
     // console.log(username)
-    if (username){
-    document.querySelector('.username').innerHTML = username
+    if (username) {
+        document.querySelector('.username').innerHTML = username
 
     }
 
 }
 
-// 退出功能 清空本地存儲 提示用戶 跳轉
+// 5.退出功能 清空本地存儲 提示用戶 跳轉
 const logout = () => {
     document.querySelector('#logout').addEventListener('click', () => {
         localStorage.removeItem('userMsg')
@@ -51,31 +53,50 @@ const logout = () => {
     })
 }
 
-// 獲取數據 渲染頁面
 
-// 封裝數據函式
-const getData = async () =>{
-const data = localStorage.getItem('userMsg') ? JSON.parse(localStorage.getItem('userMsg')):{}
-const {token} = data
-// console.log(token);
-// 請求頭參數
-const res = await axios({
-    url:'/dashboard',
-    method: 'GET',
-    headers: {
-        Authorization:token
+
+
+// 6.請求攔截器
+// 添加请求拦截器
+axios.interceptors.request.use(config => {
+    // 在发送请求之前做些什么
+    // console.log(config);
+    // 只有有了token 才添加到請求頭中
+    const { token } = data
+    console.log(token)
+
+    if (token) {
+        config.headers['Authorization'] = token
+
     }
-    
-})
-    // console.log(res.data.data.overview)
-    renderOverview(res.data.data.overview)
-}
-getData()
 
-// 渲染頁面 overview
-const renderOverview = (overview)=>{
-    // 數據的鍵和頁面的類名一致
-    Object.keys(overview).forEach(item =>{
-        document.querySelector(`.${item}`).innerHTML = overview[item]
-    })
-}
+    // console.log('我被經過了');
+
+    return config
+}, error => {
+    // 对请求错误做些什么
+    return Promise.reject(error)
+})
+
+// 7。添加响应拦截器
+axios.interceptors.response.use(response => {
+    // 2xx 范围内的状态码都会触发该函数。
+    // 对响应数据做点什么
+    
+    return response.data
+}, error => {
+        console.dir(error);
+
+            if (error.response.status === 401) {
+            showToast('登錄過期，請重新登錄')
+            localStorage.removeItem('userMsg')
+            setTimeout(() => {
+                location.href = './login.html'
+            }, 1500)
+
+        }
+
+    // 超出 2xx 范围的状态码都会触发该函数。
+    // 对响应错误做点什么
+    return Promise.reject(error)
+});

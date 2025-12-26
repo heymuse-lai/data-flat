@@ -23,10 +23,10 @@ document.querySelector('#btn-login').addEventListener('click', async e => {
         const res = await axios.post('/login', data)
         //本地存儲
         const obj = {}
-        obj.username = res.data.data.username
-        obj.token = res.data.data.token
+        obj.username = res.data.username
+        obj.token = res.data.token
         localStorage.setItem('userMsg', JSON.stringify(obj))
-        showToast(res.data.message)
+        showToast(res.message)
         setTimeout(() => {
             location.href = './index.html'
         }, 1500)

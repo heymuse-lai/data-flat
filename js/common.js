@@ -15,7 +15,7 @@ const showToast = (msg) => {
 
 }
 const data = localStorage.getItem('userMsg') ? JSON.parse(localStorage.getItem('userMsg')) : {}
-
+    console.log(data)
 // 3.判斷是否有token
 const checkToken = () => {
     const { token } = data

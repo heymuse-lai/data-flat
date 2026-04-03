@@ -22,8 +22,10 @@ const getData = async () => {
             // }
 
         })
+        const { overview, year } = res.data
         // console.log(res.data.data.overview)
-        renderOverview(res.data.overview)
+        renderOverview(overview)
+        renderoverYear(year)
 
     } catch (err) {
         // console.dir(err)
@@ -49,4 +51,86 @@ const renderOverview = (overview) => {
         document.querySelector(`.${item}`).innerHTML = overview[item]
     })
 }
+
+// 渲染折線圖 renderoverYear
+const renderoverYear = (year) => {
+    console.log(year)
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.querySelector('#line'))
+
+    // 指定图表的配置项和数据
+    const option = {
+        title: {
+            text: '2022全學科薪資走勢',
+            top: 10,
+            left: 20
+
+        },
+        grid: {
+            top: '20%',
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        xAxis: {
+            type: 'category',
+            data: year.map(item => item.month)
+        },
+        yAxis: {
+            splitLine: {
+                // show:false,
+                lineStyle: {
+                    type: 'dashed',
+                }
+            }
+        },
+        series: [
+            {
+                data: year.map(item => item.salary),
+                type: 'line',
+                symbolSize: 10,
+                lineStyle: {
+                    width: 10,
+                    color: {
+                        type: 'linear',
+                        x: 0,
+                        y: 0,
+                        x2: 1,
+                        y2: 0,
+                        colorStops: [{
+                            offset: 0, color: '#499CEA' // 0% 处的颜色
+                        }, {
+                            offset: 1, color: '#5B7AE4' // 100% 处的颜色
+                        }],
+                        global: false // 缺省为 false
+                    },
+                },
+                smooth: true,
+                areaStyle: {
+                                        color: {
+                        type: 'linear',
+                        x: 0,
+                        y: 1,
+                        x2: 0,
+                        y2: 0,
+                        colorStops: [{
+                            offset: 1, color: '#A6D4F5' // 0% 处的颜色
+                        }, {
+                            offset: 0, color: 'rgba(255,255,255,0.5)' // 100% 处的颜色
+                        }],
+                        global: false // 缺省为 false
+                    },
+
+                }
+
+            }
+        ]
+    };
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+
+
+}
+
 

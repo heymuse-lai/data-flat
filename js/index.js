@@ -22,10 +22,11 @@ const getData = async () => {
             // }
 
         })
-        const { overview, year } = res.data
+        const { overview, year, salaryData } = res.data
         // console.log(res.data.data.overview)
         renderOverview(overview)
         renderoverYear(year)
+        rendersalaryData(salaryData)
 
     } catch (err) {
         // console.dir(err)
@@ -56,7 +57,7 @@ const renderOverview = (overview) => {
 const renderoverYear = (year) => {
     console.log(year)
     // 基于准备好的dom，初始化echarts实例
-    var myChart = echarts.init(document.querySelector('#line'))
+    const myChart = echarts.init(document.querySelector('#line'))
 
     // 指定图表的配置项和数据
     const option = {
@@ -107,7 +108,7 @@ const renderoverYear = (year) => {
                 },
                 smooth: true,
                 areaStyle: {
-                                        color: {
+                    color: {
                         type: 'linear',
                         x: 0,
                         y: 1,
@@ -133,4 +134,65 @@ const renderoverYear = (year) => {
 
 }
 
+// 渲染薪資分佈
+const rendersalaryData = (salaryData) => {
+    // 基于准备好的dom，初始化echarts实例
+    const myChart = echarts.init(document.querySelector('#salary'))
+    console.log(salaryData);
+
+
+    const option = {
+        title: {
+            text: '班級薪資分佈',
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            bottom: '5%',
+            left: 'center'
+        },
+        series: [
+            {
+                name: 'Access From',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                // emphasis: {
+                //     label: {
+                //         show: false,
+                //         fontSize: 40,
+                //         fontWeight: 'bold'
+                //     }
+                // },
+                labelLine: {
+                    show: false
+                },
+                // data: [
+                //     { value: 1048, name: 'Search Engine' },
+                //     { value: 735, name: 'Direct' },
+                //     { value: 580, name: 'Email' },
+                //     { value: 484, name: 'Union Ads' },
+                // ]
+                data: salaryData.map(item => {
+                    return { value: item.b_count + item.g_count, name: item.label }
+                })
+            }
+        ],
+        color: ['#F9A222', '#5197FC', '#38BCFA', '#2FD296']
+
+    }
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+
+}
 

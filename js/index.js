@@ -22,11 +22,15 @@ const getData = async () => {
             // }
 
         })
-        const { overview, year, salaryData } = res.data
+        console.log(res);
+
+        const { overview, year, salaryData, groupData } = res.data
         // console.log(res.data.data.overview)
         renderOverview(overview)
         renderoverYear(year)
         rendersalaryData(salaryData)
+        renderGroupdata(groupData)
+        renderGender(salaryData)
 
     } catch (err) {
         // console.dir(err)
@@ -48,6 +52,7 @@ getData()
 // 渲染頁面 overview
 const renderOverview = (overview) => {
     // 數據的鍵和頁面的類名一致
+
     Object.keys(overview).forEach(item => {
         document.querySelector(`.${item}`).innerHTML = overview[item]
     })
@@ -55,7 +60,7 @@ const renderOverview = (overview) => {
 
 // 渲染折線圖 renderoverYear
 const renderoverYear = (year) => {
-    console.log(year)
+    // console.log(year)
     // 基于准备好的dom，初始化echarts实例
     const myChart = echarts.init(document.querySelector('#line'))
 
@@ -138,7 +143,7 @@ const renderoverYear = (year) => {
 const rendersalaryData = (salaryData) => {
     // 基于准备好的dom，初始化echarts实例
     const myChart = echarts.init(document.querySelector('#salary'))
-    console.log(salaryData);
+    // console.log(salaryData);
 
 
     const option = {
@@ -196,3 +201,186 @@ const rendersalaryData = (salaryData) => {
 
 }
 
+// 渲染班級每組薪資
+const renderGroupdata = (groupData) => {
+    // console.log(groupData)
+    // 1.初始化
+    const myChart = echarts.init(document.querySelector('#lines'))
+    // 2.配置項
+    const option = {
+        grid: {
+            left: 70, top: 30, right: 30, bottom: 50
+        },
+        tooltip: {},
+        xAxis: {
+            type: 'category',
+            splitLine: {
+                lineStyle: 'dashed',
+                color: '#ccc',
+            },
+            axisLabel: {
+                color: '#999',
+            },
+
+            // data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            data: groupData[1].map(item => item.name)
+        },
+        yAxis: {
+            type: 'value',
+            splitLine: {
+                lineStyle: {
+                    type: 'dashed',
+                    color: '#999',
+                },
+            }
+
+        },
+        series: [
+            {
+                // data: [120, 200, 150, 80, 70, 110, 130],
+                data: groupData[1].map(item => item.hope_salary),
+                type: 'bar',
+                color: {
+                    type: 'linear',
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [{
+                        offset: 0, color: '#30D7A2' // 0% 处的颜色
+                    }, {
+                        offset: 1, color: 'rgba(255,255,255,0.5)' // 100% 处的颜色
+                    }],
+                    global: false // 缺省为 false
+                },
+            },
+
+            {
+                // data: [120, 200, 150, 80, 70, 110, 130],
+                data: groupData[1].map(item => item.salary),
+
+                type: 'bar',
+                color: {
+                    type: 'linear',
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [{
+                        offset: 0, color: '#4FA2EA' // 0% 处的颜色
+                    }, {
+                        offset: 1, color: 'rgba(255,255,255,0.5)' // 100% 处的颜色
+                    }],
+                    global: false // 缺省为 false
+                },
+            }
+
+        ]
+    }
+    // 3.使用配置項
+    myChart.setOption(option)
+    // console.log(option)
+    document.querySelector('#btns').addEventListener('click', (e) => {
+        // console.log(e);
+        // if(e.target.tagName === 'BUTTON')  // 這樣寫也可以
+        if (e.target.type === 'button') {
+            // 排它
+            document.querySelector('#btns').querySelector('.btn-blue').classList.remove('btn-blue')
+            //添加
+            e.target.classList.add('btn-blue')
+            // 切換數據
+            // console.log(e.target.innerHTML)
+            // console.log(groupData[e.target.innerHTML]);
+            const grade = e.target.innerHTML
+            option.xAxis.data = groupData[grade].map(item => item.name)
+            option.series[0].data = groupData[grade].map(item => item.hope_salary)
+            option.series[1].data = groupData[grade].map(item => item.salary)
+
+            // 重新渲染圖表
+            myChart.setOption(option)
+
+
+        }
+
+    })
+
+
+}
+
+// 渲染男女配置圖
+const renderGender = (salaryData) => {
+    console.log(salaryData)
+    // 初始化
+    const myChart = echarts.init(document.querySelector('#gender'))
+    // 配置項
+    const option = {
+
+        tooltip: {},
+        
+        title: [
+            {
+                text: '男女薪資分佈',
+                top: 10,
+                left: 10,
+                textStyle: {
+                    fontSize: 16
+                },
+            },
+            {
+                text: '男生',
+                top: '45%',
+                left: '50%',
+                textStyle: {
+                    fontSize: 12
+                },
+            },
+            {
+                text: '女生',
+                top: '85%',
+                left: '50%',
+                textStyle: {
+                    fontSize: 12
+                },
+            },
+
+        ],
+        color: ['#F9A222', '#5197FC', '#38BCFA', '#2FD296'],
+
+
+        series: [
+            {
+                name: '男生',
+                type: 'pie',
+                radius: ['20%', '30%'],
+                center: ['50%', '30%'],
+                // data: [
+                //     { value: 40, name: 'rose 1' },
+                //     { value: 38, name: 'rose 2' },
+                //     { value: 32, name: 'rose 3' },
+                //     { value: 30, name: 'rose 4' },
+                // ]
+                data:salaryData.map(item =>{
+                    return {value:item.b_count,name:item.label}
+                })
+            },
+            {
+                name: '女生',
+                type: 'pie',
+                radius: ['20%', '30%'],
+                center: ['50%', '70%'],
+                // data: [
+                //     { value: 40, name: 'rose 1' },
+                //     { value: 38, name: 'rose 2' },
+                //     { value: 32, name: 'rose 3' },
+                //     { value: 30, name: 'rose 4' },
+                // ]
+                data:salaryData.map(item =>{
+                    return {value:item.g_count,name:item.label}
+                })
+            }
+        ]
+    }
+
+    // 使用配置項
+    myChart.setOption(option)
+}

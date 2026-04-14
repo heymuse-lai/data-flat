@@ -24,13 +24,14 @@ const getData = async () => {
         })
         console.log(res);
 
-        const { overview, year, salaryData, groupData } = res.data
+        const { overview, year, salaryData, groupData, provinceData } = res.data
         // console.log(res.data.data.overview)
         renderOverview(overview)
         renderoverYear(year)
         rendersalaryData(salaryData)
         renderGroupdata(groupData)
         renderGender(salaryData)
+        renderProvinceData(provinceData)
 
     } catch (err) {
         // console.dir(err)
@@ -316,7 +317,7 @@ const renderGender = (salaryData) => {
     const option = {
 
         tooltip: {},
-        
+
         title: [
             {
                 text: '男女薪資分佈',
@@ -359,8 +360,8 @@ const renderGender = (salaryData) => {
                 //     { value: 32, name: 'rose 3' },
                 //     { value: 30, name: 'rose 4' },
                 // ]
-                data:salaryData.map(item =>{
-                    return {value:item.b_count,name:item.label}
+                data: salaryData.map(item => {
+                    return { value: item.b_count, name: item.label }
                 })
             },
             {
@@ -374,8 +375,8 @@ const renderGender = (salaryData) => {
                 //     { value: 32, name: 'rose 3' },
                 //     { value: 30, name: 'rose 4' },
                 // ]
-                data:salaryData.map(item =>{
-                    return {value:item.g_count,name:item.label}
+                data: salaryData.map(item => {
+                    return { value: item.g_count, name: item.label }
                 })
             }
         ]
@@ -384,3 +385,235 @@ const renderGender = (salaryData) => {
     // 使用配置項
     myChart.setOption(option)
 }
+
+// 渲染省份分佈圖
+const renderProvinceData = (provinceData) => {
+    console.log(provinceData)
+    const dom = document.querySelector('#map')
+// 初始化
+
+    const myChart = echarts.init(dom)
+    const dataList = [{
+        name: '北京',
+        value: 0
+    },
+    {
+        name: '天津',
+        value: 0
+    },
+    {
+        name: '上海',
+        value: 10
+    },
+    {
+        name: '重庆',
+        value: 0
+    },
+    {
+        name: '河北',
+        value: 0
+    },
+    {
+        name: '河南',
+        value: 0
+    },
+    {
+        name: '云南',
+        value: 0
+    },
+    {
+        name: '辽宁',
+        value: 0
+    },
+    {
+        name: '黑龙江',
+        value: 0
+    },
+    {
+        name: '湖南',
+        value: 0
+    },
+    {
+        name: '安徽',
+        value: 0
+    },
+    {
+        name: '山东',
+        value: 0
+    },
+    {
+        name: '新疆',
+        value: 0
+    },
+    {
+        name: '江苏',
+        value: 0
+    },
+    {
+        name: '浙江',
+        value: 0
+    },
+    {
+        name: '江西',
+        value: 0
+    },
+    {
+        name: '湖北',
+        value: 0
+    },
+    {
+        name: '广西',
+        value: 0
+    },
+    {
+        name: '甘肃',
+        value: 0
+    },
+    {
+        name: '山西',
+        value: 0
+    },
+    {
+        name: '内蒙古',
+        value: 0
+    },
+    {
+        name: '陕西',
+        value: 0
+    },
+    {
+        name: '吉林',
+        value: 0
+    },
+    {
+        name: '福建',
+        value: 10
+    },
+    {
+        name: '贵州',
+        value: 0
+    },
+    {
+        name: '广东',
+        value: 0
+    },
+    {
+        name: '青海',
+        value: 0
+    },
+    {
+        name: '西藏',
+        value: 0
+    },
+    {
+        name: '四川',
+        value: 0
+    },
+    {
+        name: '宁夏',
+        value: 0
+    },
+    {
+        name: '海南',
+        value: 0
+    },
+    {
+        name: '台湾',
+        value: 0
+    },
+    {
+        name: '香港',
+        value: 0
+    },
+    {
+        name: '澳门',
+        value: 0
+    },
+    ]
+    // 遍歷dataList中的每一個元素和provinceData中的每一個元素 如果dataList中的元素的name包含provinceData中的元素的name 就把provinceData中的value賦值給dataList中的value
+    dataList.forEach(item => {
+        const res = provinceData.find(ele =>{
+            return ele.name.includes(item.name)
+        })
+        console.log(res);
+        
+        if(res!==undefined) {
+            item.value = res.value
+        }
+
+    })
+       
+    // 遍歷dataList中的每一個元素 找出value最大值 讓visualMap的max等於最大值
+    const max = Math.max(...dataList.map(item => item.value))
+    console.log(dataList);
+    console.log(max);
+
+    const option = {
+        title:{
+            text: '籍贯分布图',
+            top: 10,
+            left: 20,
+            textStyle: {
+                fontSize: 16
+            },
+        },
+        visualMap: {
+            min: 0,
+            max: max,
+            left: 'left',
+            left: 40,
+            bottom: 20,
+            text: [max, 0],
+            // calculable: false,
+            // orient: 'horizontal',
+            inRange: {
+                color: ['#e0ffff', '#006edd'],
+                // symbolSize: [30, 100]
+            }
+        },
+        tooltip: {
+            padding: 8,
+            enterable: true,
+            transitionDuration: 1,
+            textStyle: {
+                color: '#000000',
+                decoration: 'none',
+            }
+        },
+        series: [{
+            name: '籍貫分佈',
+            type: 'map',
+            mapType: 'china',
+            data:dataList,
+            itemStyle: {
+                normal: {
+                    label: {
+                        show: false
+                    }
+                },
+                emphasis: {
+                    label: {
+                        show: true
+                    }
+                }
+            },
+            label: {
+                normal: { //静态的时候展示样式
+                    show: true, //是否显示地图省份得名称
+                    textStyle: {
+                        color: "#000000",
+                        fontSize: 12
+                    }
+                },
+                emphasis: { //动态展示的样式
+                    color: '#fff',
+                },
+            },
+
+        },]
+    }
+
+    myChart.setOption(option)
+}
+
+
